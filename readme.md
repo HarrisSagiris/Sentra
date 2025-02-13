@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/sentra-logo.png" alt="Sentra Browser Logo" width="200"/>
+
   
   # Sentra Browser
   
