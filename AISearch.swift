@@ -3,7 +3,7 @@ import OpenAI
 import AVFoundation
 
 class AISearchManager: ObservableObject {
-    private let openAI = OpenAI(apiToken: "YOUR_API_KEY")
+    private let openAI = OpenAI(apiToken: "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")
     private let speechRecognizer = SFSpeechRecognizer()
     private let audioEngine = AVAudioEngine()
     
