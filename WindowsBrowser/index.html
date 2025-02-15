@@ -13,6 +13,7 @@
             font-family: 'Segoe UI', Arial, sans-serif;
             background-color: #f8f9fa;
             color: #2c3e50;
+            overflow: hidden;
         }
 
         .welcome-screen {
@@ -370,7 +371,6 @@
             background: #ecf0f1;
         }
 
-        /* New loading animation */
         .loading-animation {
             position: absolute;
             top: 50%;
@@ -390,7 +390,6 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
-        /* New tooltip styles */
         [data-tooltip] {
             position: relative;
         }
@@ -410,20 +409,23 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
         }
 
         [data-tooltip]:hover:before {
             opacity: 1;
             visibility: visible;
+            transform: translateX(-50%) translateY(-5px);
         }
 
-        /* New tab styles */
         .tabs-bar {
             display: flex;
             background: #2c3e50;
             padding: 10px 15px 0;
             gap: 5px;
             overflow-x: auto;
+            user-select: none;
         }
 
         .tab {
@@ -438,6 +440,10 @@
             min-width: 180px;
             max-width: 250px;
             position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         .tab.active {
@@ -453,6 +459,12 @@
             align-items: center;
             justify-content: center;
             margin-left: auto;
+            transition: all 0.3s ease;
+        }
+
+        .tab-close:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.1);
         }
 
         .new-tab-button {
@@ -463,12 +475,28 @@
             border-radius: 10px 10px 0 0;
             cursor: pointer;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .new-tab-button:hover {
             background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .tab-favicon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+        }
+
+        .tab-title {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <div class="welcome-screen" id="welcomeScreen">
@@ -536,16 +564,31 @@
                     </svg>
                     AI Summary
                 </button>
-                <button class="toolbar-button" onclick="handlePrint()" data-tooltip="Print Page">Print</button>
-                <button class="toolbar-button" onclick="handleZoomIn()" data-tooltip="Zoom In">Zoom In</button>
-                <button class="toolbar-button" onclick="handleZoomOut()" data-tooltip="Zoom Out">Zoom Out</button>
-                <button class="toolbar-button" onclick="handleZoomReset()" data-tooltip="Reset Zoom">Reset Zoom</button>
-                <button class="toolbar-button" onclick="handleAddBookmark()" data-tooltip="Add Bookmark">Add Bookmark</button>
+                <button class="toolbar-button" onclick="handlePrint()" data-tooltip="Print Page">
+                    <i class="fas fa-print"></i>
+                    Print
+                </button>
+                <button class="toolbar-button" onclick="handleZoomIn()" data-tooltip="Zoom In">
+                    <i class="fas fa-search-plus"></i>
+                    Zoom In
+                </button>
+                <button class="toolbar-button" onclick="handleZoomOut()" data-tooltip="Zoom Out">
+                    <i class="fas fa-search-minus"></i>
+                    Zoom Out
+                </button>
+                <button class="toolbar-button" onclick="handleZoomReset()" data-tooltip="Reset Zoom">
+                    <i class="fas fa-compress-arrows-alt"></i>
+                    Reset Zoom
+                </button>
+                <button class="toolbar-button" onclick="handleAddBookmark()" data-tooltip="Add Bookmark">
+                    <i class="fas fa-bookmark"></i>
+                    Add Bookmark
+                </button>
             </div>
         </div>
         <div id="bookmarksBar" class="bookmarks-bar"></div>
         <div class="browser-content">
-            <webview id="webview" src="https://www.google.com" allowpopups webpreferences="contextIsolation=false"></webview>
+            <webview id="webview" src="about:blank" allowpopups webpreferences="contextIsolation=false"></webview>
             <div class="loading-animation" id="loadingAnimation"></div>
             <div id="aiSummary" class="ai-summary">
                 <h3>AI Summary</h3>
@@ -567,17 +610,31 @@
         const cookieBanner = document.getElementById('cookieBanner');
         const loadingAnimation = document.getElementById('loadingAnimation');
         const tabsBar = document.getElementById('tabsBar');
+        
         let isSummaryVisible = false;
         let tabs = [];
         let activeTabId = null;
+        let currentZoomLevel = 0;
 
-        // Tab management
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('cookiesAccepted')) {
+                cookieBanner.style.display = 'flex';
+            } else {
+                cookieBanner.style.display = 'none';
+            }
+            
+            createNewTab();
+            ipcRenderer.send('get-bookmarks');
+        });
+
         function createNewTab(url = 'https://www.google.com') {
             const tabId = Date.now();
             const tab = {
                 id: tabId,
                 url: url,
-                title: 'New Tab'
+                title: 'New Tab',
+                favicon: ''
             };
             
             tabs.push(tab);
@@ -587,13 +644,29 @@
             tabElement.className = 'tab active';
             tabElement.setAttribute('data-tab-id', tabId);
             tabElement.innerHTML = `
+                <img class="tab-favicon" src="${tab.favicon || 'favicon.ico'}" onerror="this.src='favicon.ico'">
                 <span class="tab-title">${tab.title}</span>
                 <div class="tab-close" onclick="closeTab(${tabId})">×</div>
             `;
             
+            tabElement.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('tab-close')) {
+                    switchTab(tabId);
+                }
+            });
+            
             tabsBar.insertBefore(tabElement, document.querySelector('.new-tab-button'));
-            loadURL(url);
             updateTabs();
+            loadURL(url);
+        }
+
+        function switchTab(tabId) {
+            activeTabId = tabId;
+            const tab = tabs.find(t => t.id === tabId);
+            if (tab) {
+                loadURL(tab.url);
+                updateTabs();
+            }
         }
 
         function closeTab(tabId) {
@@ -604,6 +677,7 @@
                     createNewTab();
                 } else {
                     activeTabId = tabs[Math.min(index, tabs.length - 1)].id;
+                    switchTab(activeTabId);
                 }
                 updateTabs();
             }
@@ -616,17 +690,18 @@
             });
         }
 
-        // Initialize first tab
-        createNewTab();
-
-        // Always show welcome screen on startup
-        welcomeScreen.classList.remove('hidden');
-
-        // Check cookie acceptance
-        if (!localStorage.getItem('cookiesAccepted')) {
-            cookieBanner.style.display = 'flex';
-        } else {
-            cookieBanner.style.display = 'none';
+        function updateTabInfo(id, info) {
+            const tab = tabs.find(t => t.id === id);
+            if (tab) {
+                Object.assign(tab, info);
+                const tabElement = document.querySelector(`.tab[data-tab-id="${id}"]`);
+                if (tabElement) {
+                    const favicon = tabElement.querySelector('.tab-favicon');
+                    const title = tabElement.querySelector('.tab-title');
+                    if (info.favicon) favicon.src = info.favicon;
+                    if (info.title) title.textContent = info.title;
+                }
+            }
         }
 
         function acceptCookies() {
@@ -645,8 +720,14 @@
         function loadURL(url) {
             welcomeScreen.classList.add('hidden');
             loadingAnimation.style.display = 'block';
+            
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = `https://${url}`;
+            }
+            
             webview.loadURL(url);
             urlInput.value = url;
+            updateTabInfo(activeTabId, { url });
         }
 
         webview.addEventListener('did-start-loading', () => {
@@ -657,28 +738,46 @@
         webview.addEventListener('did-finish-load', () => {
             loadingAnimation.style.display = 'none';
             urlInput.value = webview.getURL();
+            
+            webview.getTitle().then(title => {
+                updateTabInfo(activeTabId, { 
+                    title,
+                    url: webview.getURL()
+                });
+            });
+            
             ipcRenderer.send('update-history', {
                 url: webview.getURL(),
                 title: webview.getTitle()
             });
         });
 
+        webview.addEventListener('page-favicon-updated', (e) => {
+            updateTabInfo(activeTabId, { favicon: e.favicons[0] });
+        });
+
         function handleSearch(e) {
             if (e.key === 'Enter') {
                 let url = urlInput.value;
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                if (!url.match(/^https?:\/\//i) && !url.includes('.')) {
                     url = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
+                } else if (!url.match(/^https?:\/\//i)) {
+                    url = `https://${url}`;
                 }
                 loadURL(url);
             }
         }
 
         function goBack() {
-            webview.goBack();
+            if (webview.canGoBack()) {
+                webview.goBack();
+            }
         }
 
         function goForward() {
-            webview.goForward();
+            if (webview.canGoForward()) {
+                webview.goForward();
+            }
         }
 
         function refresh() {
@@ -690,21 +789,26 @@
         }
 
         function handleZoomIn() {
-            webview.setZoomLevel(webview.getZoomLevel() + 0.5);
+            currentZoomLevel += 0.1;
+            webview.setZoomLevel(currentZoomLevel);
         }
 
         function handleZoomOut() {
-            webview.setZoomLevel(webview.getZoomLevel() - 0.5);
+            currentZoomLevel -= 0.1;
+            webview.setZoomLevel(currentZoomLevel);
         }
 
         function handleZoomReset() {
+            currentZoomLevel = 0;
             webview.setZoomLevel(0);
         }
 
         function handleAddBookmark() {
-            ipcRenderer.send('add-bookmark', {
-                url: webview.getURL(),
-                title: webview.getTitle()
+            webview.getTitle().then(title => {
+                ipcRenderer.send('add-bookmark', {
+                    url: webview.getURL(),
+                    title: title
+                });
             });
         }
 
@@ -722,20 +826,6 @@
                 bookmarksBar.appendChild(bookmarkElement);
             });
         }
-
-        ipcRenderer.on('download-progress', (event, data) => {
-            downloadProgress.style.display = 'block';
-            downloadProgress.textContent = `Downloading ${data.filename}: ${Math.round(data.progress)}%`;
-        });
-
-        ipcRenderer.on('download-complete', (event, data) => {
-            downloadProgress.textContent = data.success ? 
-                `Downloaded ${data.filename} successfully` : 
-                `Failed to download ${data.filename}`;
-            setTimeout(() => {
-                downloadProgress.style.display = 'none';
-            }, 3000);
-        });
 
         function toggleAISummary() {
             isSummaryVisible = !isSummaryVisible;
