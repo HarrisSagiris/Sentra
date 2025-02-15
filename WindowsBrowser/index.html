@@ -10,27 +10,47 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
         }
 
+        :root {
+            --primary-color: #1a73e8;
+            --hover-color: #1557b0;
+            --bg-color: #ffffff;
+            --text-color: #202124;
+            --border-color: #dfe1e5;
+            --toolbar-bg: #f0f0f0;
+        }
+
+        /* Dark mode */
+        [data-theme="dark"] {
+            --primary-color: #8ab4f8;
+            --hover-color: #aecbfa;
+            --bg-color: #202124;
+            --text-color: #e8eaed;
+            --border-color: #5f6368;
+            --toolbar-bg: #292a2d;
+        }
+
         body {
-            background: #ffffff;
-            color: #000000;
+            background: var(--bg-color);
+            color: var(--text-color);
             overflow: hidden;
             height: 100vh;
             width: 100vw;
+            transition: all 0.3s ease;
         }
 
         .browser-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background: #ffffff;
+            background: var(--bg-color);
         }
 
         .toolbar {
             display: flex;
             align-items: center;
             padding: 0.5rem;
-            background: #f0f0f0;
-            border-bottom: 1px solid #e0e0e0;
+            background: var(--toolbar-bg);
+            border-bottom: 1px solid var(--border-color);
             -webkit-app-region: drag;
             height: 42px;
         }
@@ -48,7 +68,7 @@
             padding: 0.5rem;
             border-radius: 50%;
             cursor: pointer;
-            color: #5f6368;
+            color: var(--text-color);
             transition: all 0.15s ease;
             width: 32px;
             height: 32px;
@@ -58,8 +78,7 @@
         }
 
         .nav-button:hover {
-            background: rgba(0, 0, 0, 0.08);
-            color: #202124;
+            background: rgba(var(--text-color-rgb), 0.08);
         }
 
         .nav-button:disabled {
@@ -71,9 +90,9 @@
             flex: 1;
             display: flex;
             align-items: center;
-            background: #ffffff;
+            background: var(--bg-color);
             border-radius: 24px;
-            border: 1px solid #dfe1e5;
+            border: 1px solid var(--border-color);
             margin: 0 0.5rem;
             padding: 0 1rem;
             height: 36px;
@@ -82,14 +101,10 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .address-bar:hover {
-            box-shadow: 0 1px 6px rgba(32,33,36,0.28);
-            border-color: rgba(223,225,229,0);
-        }
-
+        .address-bar:hover,
         .address-bar:focus-within {
             box-shadow: 0 1px 6px rgba(32,33,36,0.28);
-            border-color: rgba(223,225,229,0);
+            border-color: var(--primary-color);
         }
 
         .address-bar input {
@@ -98,7 +113,7 @@
             background: none;
             outline: none;
             font-size: 14px;
-            color: #202124;
+            color: var(--text-color);
             padding: 0 0.5rem;
             width: 100%;
         }
@@ -114,7 +129,7 @@
             width: 32px;
             height: 32px;
             background: transparent;
-            color: #5f6368;
+            color: var(--text-color);
             border: none;
             border-radius: 50%;
             cursor: pointer;
@@ -125,14 +140,13 @@
         }
 
         .toolbar-button:hover {
-            background: rgba(0, 0, 0, 0.08);
-            color: #202124;
+            background: rgba(var(--text-color-rgb), 0.08);
         }
 
         .browser-content {
             flex: 1;
             position: relative;
-            background: #ffffff;
+            background: var(--bg-color);
         }
 
         #webview {
@@ -148,15 +162,15 @@
             transform: translate(-50%, -50%);
             width: 24px;
             height: 24px;
-            border: 3px solid #f3f3f3;
+            border: 3px solid var(--border-color);
             border-radius: 50%;
-            border-top: 3px solid #1a73e8;
+            border-top: 3px solid var(--primary-color);
             animation: spin 0.8s linear infinite;
         }
 
         .tabs-bar {
             display: flex;
-            background: #dee1e6;
+            background: var(--toolbar-bg);
             padding: 0.5rem 0.5rem 0;
             gap: 0.25rem;
             height: 40px;
@@ -164,10 +178,10 @@
 
         .tab {
             padding: 0.5rem 1rem;
-            background: #f1f3f4;
+            background: rgba(var(--text-color-rgb), 0.05);
             border-radius: 8px 8px 0 0;
             font-size: 12px;
-            color: #5f6368;
+            color: var(--text-color);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -182,13 +196,12 @@
         }
 
         .tab.active {
-            background: #ffffff;
-            color: #202124;
-            border-color: #dee1e6;
+            background: var(--bg-color);
+            border-color: var(--border-color);
         }
 
         .tab:hover {
-            background: #ffffff;
+            background: var(--bg-color);
         }
 
         .tab-close {
@@ -202,8 +215,8 @@
             opacity: 0;
             transition: all 0.15s;
             font-size: 14px;
-            color: #5f6368;
-            background: #e8eaed;
+            color: var(--text-color);
+            background: rgba(var(--text-color-rgb), 0.08);
         }
 
         .tab:hover .tab-close {
@@ -211,14 +224,13 @@
         }
 
         .tab-close:hover {
-            background: #dadce0;
-            color: #202124;
+            background: rgba(var(--text-color-rgb), 0.15);
         }
 
         .new-tab-button {
             padding: 0.5rem;
             background: transparent;
-            color: #5f6368;
+            color: var(--text-color);
             border: none;
             border-radius: 50%;
             cursor: pointer;
@@ -232,15 +244,14 @@
         }
 
         .new-tab-button:hover {
-            background: rgba(0, 0, 0, 0.08);
-            color: #202124;
+            background: rgba(var(--text-color-rgb), 0.08);
         }
 
         .bookmarks-bar {
             display: flex;
             padding: 0.25rem 0.75rem;
-            background: #ffffff;
-            border-bottom: 1px solid #e0e0e0;
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
             gap: 0.75rem;
             height: 32px;
             align-items: center;
@@ -249,7 +260,7 @@
         .bookmark-item {
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
-            color: #5f6368;
+            color: var(--text-color);
             cursor: pointer;
             font-size: 12px;
             white-space: nowrap;
@@ -261,8 +272,114 @@
         }
 
         .bookmark-item:hover {
-            background: rgba(0, 0, 0, 0.05);
-            color: #202124;
+            background: rgba(var(--text-color-rgb), 0.08);
+        }
+
+        /* AI Summary Panel */
+        .ai-summary-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: var(--bg-color);
+            border-left: 1px solid var(--border-color);
+            transition: right 0.3s ease;
+            padding: 1rem;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .ai-summary-panel.open {
+            right: 0;
+        }
+
+        .ai-summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ai-summary-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: var(--bg-color);
+            border-left: 1px solid var(--border-color);
+            transition: right 0.3s ease;
+            padding: 1rem;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
 
         @keyframes spin {
@@ -277,16 +394,16 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: var(--bg-color);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
+            background: var(--border-color);
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
+            background: var(--text-color);
         }
 
     </style>
@@ -319,6 +436,11 @@
                        onkeypress="handleSearch(event)">
             </div>
             <div class="toolbar-buttons">
+                <button class="toolbar-button" onclick="toggleAISummary()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                </button>
                 <button class="toolbar-button" onclick="handleShare()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
@@ -329,12 +451,47 @@
                         <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
                     </svg>
                 </button>
+                <button class="toolbar-button" onclick="toggleSettings()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                    </svg>
+                </button>
             </div>
         </div>
         <div id="bookmarksBar" class="bookmarks-bar"></div>
         <div class="browser-content">
             <webview id="webview" src="about:blank" allowpopups webpreferences="contextIsolation=false"></webview>
             <div class="loading-animation" id="loadingAnimation"></div>
+        </div>
+    </div>
+
+    <!-- AI Summary Panel -->
+    <div class="ai-summary-panel" id="aiSummaryPanel">
+        <div class="ai-summary-header">
+            <h3>AI Summary</h3>
+            <button class="toolbar-button" onclick="toggleAISummary()">×</button>
+        </div>
+        <div class="ai-summary-content" id="aiSummaryContent">
+            <input type="text" id="apiKeyInput" placeholder="Enter OpenAI API Key" style="width: 100%; margin-bottom: 1rem;">
+            <button onclick="summarizeCurrentPage()" style="width: 100%; padding: 0.5rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Summarize Page
+            </button>
+            <div id="summaryResult" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="ai-summary-header">
+            <h3>Settings</h3>
+            <button class="toolbar-button" onclick="toggleSettings()">×</button>
+        </div>
+        <div class="theme-toggle">
+            <span>Dark Mode</span>
+            <label class="switch">
+                <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+                <span class="slider"></span>
+            </label>
         </div>
     </div>
 
@@ -347,6 +504,8 @@
         const tabsBar = document.getElementById('tabsBar');
         const backButton = document.getElementById('backButton');
         const forwardButton = document.getElementById('forwardButton');
+        const aiSummaryPanel = document.getElementById('aiSummaryPanel');
+        const settingsPanel = document.getElementById('settingsPanel');
         
         let tabs = [];
         let activeTabId = null;
@@ -357,226 +516,103 @@
             ipcRenderer.send('get-bookmarks');
             updateNavigationButtons();
             loadingAnimation.style.display = 'none';
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.getElementById('themeToggle').checked = savedTheme === 'dark';
+            }
         });
 
-        function createNewTab(url = 'https://www.google.com') {
-            const tabId = Date.now();
-            const tab = {
-                id: tabId,
-                url: url,
-                title: 'New Tab',
-                favicon: ''
-            };
-            
-            tabs.push(tab);
-            activeTabId = tabId;
-            
-            const tabElement = document.createElement('div');
-            tabElement.className = 'tab active';
-            tabElement.setAttribute('data-tab-id', tabId);
-            tabElement.innerHTML = `
-                <span class="tab-title">${tab.title}</span>
-                <div class="tab-close" onclick="closeTab(${tabId})">×</div>
-            `;
-            
-            tabElement.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('tab-close')) {
-                    switchTab(tabId);
-                }
-            });
-            
-            tabsBar.insertBefore(tabElement, document.querySelector('.new-tab-button'));
-            updateTabs();
-            loadURL(url);
+        function toggleTheme() {
+            const isDark = document.getElementById('themeToggle').checked;
+            const theme = isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
         }
 
-        function updateNavigationButtons() {
-            backButton.disabled = !webview.canGoBack();
-            forwardButton.disabled = !webview.canGoForward();
+        function toggleAISummary() {
+            aiSummaryPanel.classList.toggle('open');
+            settingsPanel.classList.remove('open');
         }
 
-        function switchTab(tabId) {
-            activeTabId = tabId;
-            const tab = tabs.find(t => t.id === tabId);
-            if (tab) {
-                loadURL(tab.url);
-                updateTabs();
+        function toggleSettings() {
+            settingsPanel.classList.toggle('open');
+            aiSummaryPanel.classList.remove('open');
+        }
+
+        async function summarizeCurrentPage() {
+            const apiKey = document.getElementById('apiKeyInput').value;
+            if (!apiKey) {
+                alert('Please enter your OpenAI API key');
+                return;
             }
-        }
 
-        function closeTab(tabId) {
-            const index = tabs.findIndex(tab => tab.id === tabId);
-            if (index > -1) {
-                tabs.splice(index, 1);
-                const tabElement = document.querySelector(`.tab[data-tab-id="${tabId}"]`);
-                if (tabElement) {
-                    tabElement.remove();
-                }
-                
-                if (tabs.length === 0) {
-                    createNewTab();
-                } else if (activeTabId === tabId) {
-                    activeTabId = tabs[Math.min(index, tabs.length - 1)].id;
-                    switchTab(activeTabId);
-                }
-                updateTabs();
-            }
-        }
+            const summaryResult = document.getElementById('summaryResult');
+            summaryResult.innerHTML = 'Generating summary...';
 
-        function updateTabs() {
-            document.querySelectorAll('.tab').forEach(tab => {
-                const tabId = parseInt(tab.getAttribute('data-tab-id'));
-                tab.classList.toggle('active', tabId === activeTabId);
-            });
-        }
-
-        function loadURL(url) {
-            loadingAnimation.style.display = 'block';
-            
             try {
-                const urlObj = new URL(url);
-                webview.loadURL(url);
-            } catch {
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    url = `https://${url}`;
-                    try {
-                        new URL(url);
-                        webview.loadURL(url);
-                    } catch {
-                        webview.loadURL(`https://www.google.com/search?q=${encodeURIComponent(url)}`);
-                    }
-                }
-            }
-            
-            urlInput.value = url;
-            updateTabInfo(activeTabId, { url });
-        }
+                const content = await webview.executeJavaScript(`
+                    document.body.innerText
+                `);
 
-        function handleSearch(e) {
-            if (e.key === 'Enter') {
-                const url = urlInput.value.trim();
-                loadURL(url);
-            }
-        }
-
-        function updateTabInfo(id, info) {
-            const tab = tabs.find(t => t.id === id);
-            if (tab) {
-                Object.assign(tab, info);
-                const tabElement = document.querySelector(`.tab[data-tab-id="${id}"]`);
-                if (tabElement) {
-                    const titleElement = tabElement.querySelector('.tab-title');
-                    if (titleElement && info.title) {
-                        titleElement.textContent = info.title.length > 25 
-                            ? info.title.substring(0, 25) + '...' 
-                            : info.title;
-                        titleElement.title = info.title;
-                    }
-                }
-            }
-        }
-
-        webview.addEventListener('did-start-loading', () => {
-            loadingAnimation.style.display = 'block';
-            urlInput.value = webview.getURL();
-            updateNavigationButtons();
-        });
-
-        webview.addEventListener('did-finish-load', () => {
-            loadingAnimation.style.display = 'none';
-            urlInput.value = webview.getURL();
-            updateNavigationButtons();
-            
-            webview.getTitle().then(title => {
-                updateTabInfo(activeTabId, { 
-                    title,
-                    url: webview.getURL()
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo",
+                        messages: [{
+                            role: "user",
+                            content: `Summarize this text in 3-4 key points: ${content.substring(0, 2000)}`
+                        }]
+                    })
                 });
+
+                const data = await response.json();
+                if (data.choices && data.choices[0]) {
+                    summaryResult.innerHTML = data.choices[0].message.content.replace(/\n/g, '<br>');
+                } else {
+                    throw new Error('Invalid response from OpenAI');
+                }
+            } catch (error) {
+                summaryResult.innerHTML = `Error: ${error.message}`;
+            }
+        }
+
+        // Initialize event listeners when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set up navigation button handlers
+            document.getElementById('backBtn').addEventListener('click', goBack);
+            document.getElementById('forwardBtn').addEventListener('click', goForward);
+            document.getElementById('refreshBtn').addEventListener('click', refresh);
+            document.getElementById('homeBtn').addEventListener('click', goHome);
+            
+            // Set up URL bar handlers
+            const urlBar = document.getElementById('urlBar');
+            urlBar.addEventListener('keypress', handleUrlBarKeyPress);
+            
+            // Set up theme toggle
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            // Set up panel toggles
+            document.getElementById('aiSummaryBtn').addEventListener('click', toggleAISummary);
+            document.getElementById('settingsBtn').addEventListener('click', toggleSettings);
+            
+            // Set up webview load handlers
+            webview.addEventListener('did-start-loading', () => {
+                document.getElementById('refreshBtn').classList.add('loading');
+            });
+            
+            webview.addEventListener('did-stop-loading', () => {
+                document.getElementById('refreshBtn').classList.remove('loading');
+                urlBar.value = webview.getURL();
             });
         });
 
-        webview.addEventListener('did-fail-load', (event) => {
-            loadingAnimation.style.display = 'none';
-            if (event.errorCode !== -3) { // Ignore user aborted loads
-                webview.loadURL(`file://${__dirname}/error.html`);
-            }
-        });
-
-        function goBack() {
-            if (webview.canGoBack()) {
-                webview.goBack();
-            }
-        }
-
-        function goForward() {
-            if (webview.canGoForward()) {
-                webview.goForward();
-            }
-        }
-
-        function refresh() {
-            webview.reload();
-        }
-
-        function handleShare() {
-            ipcRenderer.send('share-url', webview.getURL());
-        }
-
-        function handleAddBookmark() {
-            webview.getTitle().then(title => {
-                ipcRenderer.send('add-bookmark', {
-                    url: webview.getURL(),
-                    title: title
-                });
-            });
-        }
-
-        ipcRenderer.on('bookmarks-updated', (event, bookmarks) => {
-            updateBookmarksBar(bookmarks);
-        });
-
-        function updateBookmarksBar(bookmarks) {
-            bookmarksBar.innerHTML = '';
-            bookmarks.forEach(bookmark => {
-                const bookmarkElement = document.createElement('div');
-                bookmarkElement.className = 'bookmark-item';
-                bookmarkElement.title = bookmark.url;
-                bookmarkElement.innerHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#5f6368">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                    </svg>
-                    <span>${bookmark.title}</span>
-                `;
-                bookmarkElement.onclick = () => loadURL(bookmark.url);
-                bookmarksBar.appendChild(bookmarkElement);
-            });
-        }
-
-        // Initialize
-        ipcRenderer.send('get-bookmarks');
-
-        webview.addEventListener('new-window', (e) => {
-            e.preventDefault();
-            createNewTab(e.url);
-        });
-
-        webview.addEventListener('will-navigate', (e) => {
-            urlInput.value = e.url;
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 't') {
-                e.preventDefault();
-                createNewTab();
-            } else if (e.ctrlKey && e.key === 'w') {
-                e.preventDefault();
-                closeTab(activeTabId);
-            } else if (e.ctrlKey && e.key === 'r') {
-                e.preventDefault();
-                refresh();
-            }
-        });
     </script>
 </body>
 </html>
