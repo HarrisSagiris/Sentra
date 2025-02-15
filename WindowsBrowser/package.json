@@ -1,0 +1,27 @@
+{
+  "name": "sentra-browser",
+  "version": "1.0.0",
+  "description": "A modern web browser built with Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^24.3.0",
+    "electron-builder": "^24.3.0"
+  },
+  "build": {
+    "appId": "com.sentra.browser",
+    "productName": "Sentra Browser",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    }
+  }
+}
