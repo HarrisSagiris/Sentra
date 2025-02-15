@@ -3,7 +3,7 @@
 <head>
     <title>Sentra Browser</title>
     <style>
-        * {
+            * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -513,7 +513,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             createNewTab();
-            ipcRenderer.send('get-bookmarks');
+            loadBookmarks();
             updateNavigationButtons();
             loadingAnimation.style.display = 'none';
             
@@ -525,6 +525,188 @@
             }
         });
 
+        // Handle URL input and search
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                let url = urlInput.value.trim();
+                
+                // Check if input is a search query or URL
+                if (!url.includes('.') || url.includes(' ')) {
+                    url = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
+                } else if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = `https://${url}`;
+                }
+
+                loadURL(url);
+            }
+        }
+
+        function loadURL(url) {
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (tab) {
+                tab.url = url;
+                webview.loadURL(url);
+                updateTab(tab);
+            }
+        }
+
+        // Tab Management
+        function createNewTab() {
+            const id = Date.now();
+            const tab = {
+                id,
+                title: 'New Tab',
+                url: 'about:blank',
+                favicon: ''
+            };
+            
+            tabs.push(tab);
+            activeTabId = id;
+            
+            const tabElement = createTabElement(tab);
+            tabsBar.insertBefore(tabElement, tabsBar.lastElementChild);
+            
+            activateTab(id);
+            return tab;
+        }
+
+        function createTabElement(tab) {
+            const div = document.createElement('div');
+            div.className = 'tab';
+            div.setAttribute('data-tab-id', tab.id);
+            div.innerHTML = `
+                <img src="${tab.favicon || ''}" width="16" height="16" onerror="this.style.display='none'">
+                <span>${tab.title}</span>
+                <span class="tab-close" onclick="closeTab(${tab.id})">×</span>
+            `;
+            div.onclick = (e) => {
+                if (!e.target.classList.contains('tab-close')) {
+                    activateTab(tab.id);
+                }
+            };
+            return div;
+        }
+
+        function activateTab(id) {
+            activeTabId = id;
+            const tab = tabs.find(t => t.id === id);
+            
+            // Update tab UI
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.remove('active');
+                if (t.getAttribute('data-tab-id') == id) {
+                    t.classList.add('active');
+                }
+            });
+
+            // Load tab content
+            if (tab) {
+                webview.loadURL(tab.url);
+                urlInput.value = tab.url;
+            }
+        }
+
+        function closeTab(id) {
+            const index = tabs.findIndex(t => t.id === id);
+            if (index > -1) {
+                tabs.splice(index, 1);
+                document.querySelector(`[data-tab-id="${id}"]`).remove();
+                
+                if (activeTabId === id) {
+                    if (tabs.length > 0) {
+                        activateTab(tabs[tabs.length - 1].id);
+                    } else {
+                        createNewTab();
+                    }
+                }
+            }
+        }
+
+        // Navigation
+        function goBack() {
+            if (webview.canGoBack()) {
+                webview.goBack();
+            }
+        }
+
+        function goForward() {
+            if (webview.canGoForward()) {
+                webview.goForward();
+            }
+        }
+
+        function refresh() {
+            webview.reload();
+        }
+
+        function updateNavigationButtons() {
+            backButton.disabled = !webview.canGoBack();
+            forwardButton.disabled = !webview.canGoForward();
+        }
+
+        // Bookmarks
+        function loadBookmarks() {
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            renderBookmarks(bookmarks);
+        }
+
+        function renderBookmarks(bookmarks) {
+            bookmarksBar.innerHTML = bookmarks.map(b => `
+                <div class="bookmark-item" onclick="loadURL('${b.url}')">
+                    <img src="${b.favicon}" width="16" height="16" onerror="this.style.display='none'">
+                    <span>${b.title}</span>
+                </div>
+            `).join('');
+        }
+
+        function handleAddBookmark() {
+            const bookmark = {
+                url: webview.getURL(),
+                title: webview.getTitle(),
+                favicon: webview.getFavicon()
+            };
+            
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            bookmarks.push(bookmark);
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            renderBookmarks(bookmarks);
+        }
+
+        // WebView Events
+        webview.addEventListener('did-start-loading', () => {
+            loadingAnimation.style.display = 'block';
+        });
+
+        webview.addEventListener('did-stop-loading', () => {
+            loadingAnimation.style.display = 'none';
+            updateNavigationButtons();
+            
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (tab) {
+                tab.title = webview.getTitle();
+                tab.url = webview.getURL();
+                tab.favicon = webview.getFavicon();
+                updateTab(tab);
+            }
+            
+            urlInput.value = webview.getURL();
+        });
+
+        function updateTab(tab) {
+            const tabElement = document.querySelector(`[data-tab-id="${tab.id}"]`);
+            if (tabElement) {
+                const img = tabElement.querySelector('img');
+                const span = tabElement.querySelector('span');
+                
+                if (tab.favicon) {
+                    img.src = tab.favicon;
+                    img.style.display = '';
+                }
+                span.textContent = tab.title;
+            }
+        }
+
+        // Theme Toggle
         function toggleTheme() {
             const isDark = document.getElementById('themeToggle').checked;
             const theme = isDark ? 'dark' : 'light';
@@ -532,6 +714,7 @@
             localStorage.setItem('theme', theme);
         }
 
+        // Panel Toggles
         function toggleAISummary() {
             aiSummaryPanel.classList.toggle('open');
             settingsPanel.classList.remove('open');
@@ -542,6 +725,15 @@
             aiSummaryPanel.classList.remove('open');
         }
 
+        // Share
+        function handleShare() {
+            const url = webview.getURL();
+            navigator.clipboard.writeText(url).then(() => {
+                alert('URL copied to clipboard!');
+            });
+        }
+
+        // AI Summary
         async function summarizeCurrentPage() {
             const apiKey = document.getElementById('apiKeyInput').value;
             if (!apiKey) {
@@ -582,37 +774,6 @@
                 summaryResult.innerHTML = `Error: ${error.message}`;
             }
         }
-
-        // Initialize event listeners when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set up navigation button handlers
-            document.getElementById('backBtn').addEventListener('click', goBack);
-            document.getElementById('forwardBtn').addEventListener('click', goForward);
-            document.getElementById('refreshBtn').addEventListener('click', refresh);
-            document.getElementById('homeBtn').addEventListener('click', goHome);
-            
-            // Set up URL bar handlers
-            const urlBar = document.getElementById('urlBar');
-            urlBar.addEventListener('keypress', handleUrlBarKeyPress);
-            
-            // Set up theme toggle
-            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-            
-            // Set up panel toggles
-            document.getElementById('aiSummaryBtn').addEventListener('click', toggleAISummary);
-            document.getElementById('settingsBtn').addEventListener('click', toggleSettings);
-            
-            // Set up webview load handlers
-            webview.addEventListener('did-start-loading', () => {
-                document.getElementById('refreshBtn').classList.add('loading');
-            });
-            
-            webview.addEventListener('did-stop-loading', () => {
-                document.getElementById('refreshBtn').classList.remove('loading');
-                urlBar.value = webview.getURL();
-            });
-        });
-
     </script>
 </body>
 </html>
