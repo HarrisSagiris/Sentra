@@ -408,42 +408,83 @@
 
         /* Welcome Page Styles */
         .welcome-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
             padding: 2rem;
             text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
         }
 
         .welcome-page h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
             color: var(--primary-color);
+            font-weight: 700;
         }
 
         .welcome-page p {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             line-height: 1.6;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
             color: var(--text-color);
+            max-width: 600px;
+        }
+
+        .welcome-search {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 4rem;
+        }
+
+        .welcome-search input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 30px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .welcome-search input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(26,115,232,0.1);
         }
 
         .welcome-features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 2rem;
-            margin-top: 3rem;
+            width: 100%;
+            max-width: 1000px;
         }
 
         .feature-card {
-            padding: 1.5rem;
-            border-radius: 8px;
+            padding: 2rem;
+            border-radius: 12px;
             background: var(--toolbar-bg);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
         }
 
         .feature-card h3 {
+            font-size: 1.5rem;
             margin-bottom: 1rem;
             color: var(--primary-color);
+        }
+
+        .feature-card p {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            line-height: 1.5;
         }
 
     </style>
@@ -506,6 +547,10 @@
             <div id="welcomePage" class="welcome-page">
                 <h1>Welcome to Sentra Browser</h1>
                 <p>Your modern, secure, and feature-rich browsing experience starts here.</p>
+                <div class="welcome-search">
+                    <input type="text" placeholder="Search Google or enter a URL" 
+                           onkeypress="handleSearch(event)">
+                </div>
                 <div class="welcome-features">
                     <div class="feature-card">
                         <h3>Fast & Secure</h3>
@@ -513,7 +558,7 @@
                     </div>
                     <div class="feature-card">
                         <h3>AI Summary</h3>
-                        <p>Get quick summaries of web pages using AI technology.</p>
+                        <p>Get instant AI-powered summaries of any webpage with one click.</p>
                     </div>
                     <div class="feature-card">
                         <h3>Dark Mode</h3>
@@ -531,7 +576,6 @@
             <button class="toolbar-button" onclick="toggleAISummary()">×</button>
         </div>
         <div class="ai-summary-content" id="aiSummaryContent">
-            <input type="text" id="apiKeyInput" placeholder="Enter OpenAI API Key" style="width: 100%; margin-bottom: 1rem;">
             <button onclick="summarizeCurrentPage()" style="width: 100%; padding: 0.5rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">
                 Summarize Page
             </button>
@@ -567,6 +611,8 @@
         const settingsPanel = document.getElementById('settingsPanel');
         const welcomePage = document.getElementById('welcomePage');
         
+        const OPENAI_API_KEY = 'your-api-key-here'; // Replace with your actual API key
+        
         let tabs = [];
         let activeTabId = null;
 
@@ -576,10 +622,9 @@
             loadBookmarks();
             updateNavigationButtons();
             loadingAnimation.style.display = 'none';
-            webview.style.display = 'none'; // Hide webview initially
-            welcomePage.style.display = 'block'; // Show welcome page
+            webview.style.display = 'none';
+            welcomePage.style.display = 'block';
             
-            // Load saved theme
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
                 document.documentElement.setAttribute('data-theme', savedTheme);
@@ -590,18 +635,20 @@
         // Handle URL input and search
         function handleSearch(event) {
             if (event.key === 'Enter') {
-                let url = urlInput.value.trim();
+                let url = event.target.value.trim();
                 
-                // Check if input is a search query or URL
                 if (!url.includes('.') || url.includes(' ')) {
                     url = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
                 } else if (!url.startsWith('http://') && !url.startsWith('https://')) {
                     url = `https://${url}`;
                 }
 
-                webview.style.display = 'block'; // Show webview
-                welcomePage.style.display = 'none'; // Hide welcome page
+                webview.style.display = 'block';
+                welcomePage.style.display = 'none';
                 loadURL(url);
+                if (event.target !== urlInput) {
+                    urlInput.value = url;
+                }
             }
         }
 
@@ -657,7 +704,6 @@
             activeTabId = id;
             const tab = tabs.find(t => t.id === id);
             
-            // Update tab UI
             document.querySelectorAll('.tab').forEach(t => {
                 t.classList.remove('active');
                 if (t.getAttribute('data-tab-id') == id) {
@@ -665,11 +711,11 @@
                 }
             });
 
-            // Load tab content
             if (tab) {
                 if (tab.url === 'about:blank') {
                     webview.style.display = 'none';
                     welcomePage.style.display = 'block';
+                    urlInput.value = '';
                 } else {
                     webview.loadURL(tab.url);
                     urlInput.value = tab.url;
