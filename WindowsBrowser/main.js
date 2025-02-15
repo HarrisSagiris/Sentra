@@ -1,4 +1,5 @@
-const { app, BrowserWindow, ipcMain, session, dialog, shell } = require('electron');
+const electron = require('electron');
+const { BrowserWindow, ipcMain, session, dialog, shell } = electron;
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
@@ -142,17 +143,17 @@ function createWindow() {
 }
 
 // Initialize app
-app.whenReady().then(createWindow);
+electron.app.whenReady().then(createWindow);
 
 // Quit when all windows are closed
-app.on('window-all-closed', () => {
+electron.app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit();
+        electron.app.quit();
     }
 });
 
 // Recreate window when dock icon is clicked (macOS)
-app.on('activate', () => {
+electron.app.on('activate', () => {
     if (mainWindow === null) {
         createWindow();
     }
@@ -166,7 +167,7 @@ ipcMain.on('search', (event, query) => {
 });
 
 // Handle new window creation
-app.on('web-contents-created', (event, contents) => {
+electron.app.on('web-contents-created', (event, contents) => {
     contents.on('new-window', (event, navigationUrl) => {
         event.preventDefault();
         const webview = mainWindow.webContents.fromWebContents(mainWindow.webContents);
@@ -175,7 +176,7 @@ app.on('web-contents-created', (event, contents) => {
 });
 
 // Enable spellchecker
-app.on('ready', () => {
+electron.app.on('ready', () => {
     session.defaultSession.setSpellCheckerLanguages(['en-US']);
 });
 
