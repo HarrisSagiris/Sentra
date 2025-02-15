@@ -7,273 +7,71 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
         }
 
         body {
-            background: #0f172a;
-            color: #e2e8f0;
+            background: #ffffff;
+            color: #000000;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
-        }
-
-        .welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, #1e293b, #0f172a);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            padding: 2rem;
-        }
-
-        .welcome-screen.hidden {
-            opacity: 0;
-            transform: scale(0.98) translateY(-10px);
-            pointer-events: none;
-        }
-
-        .welcome-logo {
-            font-size: 5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #60a5fa, #3b82f6, #2563eb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
-            animation: float 6s ease-in-out infinite;
-            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .welcome-intro {
-            text-align: center;
-            max-width: 700px;
-            margin-bottom: 3.5rem;
-            line-height: 1.8;
-            font-size: 1.25rem;
-            color: #94a3b8;
-            animation: fadeIn 1s ease-out;
-        }
-
-        .welcome-search {
-            width: 800px;
-            padding: 1.5rem 2rem;
-            border-radius: 20px;
-            border: 2px solid #1e293b;
-            font-size: 1.25rem;
-            background: rgba(30, 41, 59, 0.5);
-            color: #e2e8f0;
-            backdrop-filter: blur(10px);
-            margin-bottom: 4rem;
-            transition: all 0.3s ease;
-        }
-
-        .welcome-search:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
-            background: rgba(30, 41, 59, 0.8);
-        }
-
-        .welcome-shortcuts {
-            display: grid;
-            grid-template-columns: repeat(4, 220px);
-            gap: 2rem;
-        }
-
-        .shortcut-card {
-            background: rgba(30, 41, 59, 0.4);
-            padding: 2rem;
-            border-radius: 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid #1e293b;
-            backdrop-filter: blur(10px);
-        }
-
-        .shortcut-card i {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .shortcut-card:hover {
-            transform: translateY(-8px);
-            background: rgba(30, 41, 59, 0.6);
-            border-color: #3b82f6;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .cookie-banner {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(30, 41, 59, 0.95);
-            padding: 1.5rem 2rem;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            z-index: 1000;
-            max-width: 90%;
-            width: 1000px;
-            backdrop-filter: blur(10px);
-            border: 1px solid #1e293b;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .cookie-banner button {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 12px;
-            background: #3b82f6;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.875rem;
-        }
-
-        .cookie-banner button:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
         }
 
         .browser-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background: #0f172a;
-        }
-
-        .tabs-bar {
-            display: flex;
-            background: #1e293b;
-            padding: 1rem 1.5rem 0;
-            gap: 0.5rem;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-
-        .tabs-bar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .tab {
-            padding: 1rem 1.5rem;
-            background: rgba(30, 41, 59, 0.4);
-            color: #94a3b8;
-            border-radius: 12px 12px 0 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            min-width: 200px;
-            max-width: 300px;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-            border-bottom: none;
-        }
-
-        .tab.active {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .tab-close {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: auto;
-            transition: all 0.3s ease;
-        }
-
-        .tab-close:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.1);
-        }
-
-        .new-tab-button {
-            padding: 1rem 1.5rem;
-            background: rgba(30, 41, 59, 0.4);
-            color: #94a3b8;
-            border: none;
-            border-radius: 12px 12px 0 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .new-tab-button:hover {
-            background: rgba(30, 41, 59, 0.6);
-            color: white;
+            background: #ffffff;
         }
 
         .toolbar {
             display: flex;
             align-items: center;
-            padding: 1.25rem 1.5rem;
-            background: #1e293b;
-            gap: 1.5rem;
-            border-bottom: 1px solid #334155;
+            padding: 0.5rem;
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+            -webkit-app-region: drag;
         }
 
         .nav-buttons {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.5rem;
+            margin-right: 0.5rem;
+            -webkit-app-region: no-drag;
         }
 
         .nav-button {
             border: none;
-            background: rgba(30, 41, 59, 0.4);
-            padding: 0.875rem;
-            border-radius: 12px;
+            background: transparent;
+            padding: 0.5rem;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            color: #94a3b8;
+            color: #666;
+            transition: all 0.2s ease;
         }
 
         .nav-button:hover {
-            background: rgba(30, 41, 59, 0.6);
-            color: white;
-            transform: translateY(-2px);
+            background: rgba(0, 0, 0, 0.05);
+            color: #000;
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .address-bar {
             flex: 1;
             display: flex;
             align-items: center;
-            background: rgba(30, 41, 59, 0.4);
-            border-radius: 12px;
-            padding: 0.5rem 1.5rem;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .address-bar:focus-within {
-            border-color: #3b82f6;
-            background: rgba(30, 41, 59, 0.6);
+            background: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            margin: 0 0.5rem;
+            padding: 0 0.5rem;
+            height: 28px;
+            -webkit-app-region: no-drag;
         }
 
         .address-bar input {
@@ -281,41 +79,40 @@
             border: none;
             background: none;
             outline: none;
-            font-size: 1rem;
-            padding: 0.75rem;
-            color: #e2e8f0;
+            font-size: 13px;
+            color: #000;
+            padding: 0 0.5rem;
         }
 
         .toolbar-buttons {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.5rem;
+            -webkit-app-region: no-drag;
         }
 
         .toolbar-button {
-            padding: 0.875rem 1.25rem;
-            background: rgba(30, 41, 59, 0.4);
-            color: #94a3b8;
+            padding: 0.5rem;
+            background: transparent;
+            color: #666;
             border: none;
-            border-radius: 12px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.875rem;
-            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.25rem;
         }
 
         .toolbar-button:hover {
-            background: rgba(30, 41, 59, 0.6);
-            color: white;
-            transform: translateY(-2px);
+            background: rgba(0, 0, 0, 0.05);
+            color: #000;
         }
 
         .browser-content {
             flex: 1;
             position: relative;
-            background: #0f172a;
+            background: #ffffff;
         }
 
         #webview {
@@ -329,76 +126,97 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            border: 3px solid #1e293b;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e0e0e0;
             border-radius: 50%;
-            border-top: 3px solid #3b82f6;
+            border-top: 2px solid #007AFF;
             animation: spin 1s linear infinite;
         }
 
-        .ai-summary {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            width: 400px;
-            background: rgba(30, 41, 59, 0.95);
-            border-radius: 16px;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid #334155;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            display: none;
-            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        .tabs-bar {
+            display: flex;
+            background: #f5f5f5;
+            padding: 0.5rem 0.5rem 0;
+            gap: 0.25rem;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        .ai-summary.visible {
-            display: block;
+        .tab {
+            padding: 0.5rem 1rem;
+            background: #e8e8e8;
+            border-radius: 8px 8px 0 0;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 140px;
+            max-width: 200px;
+            height: 28px;
+            position: relative;
         }
 
-        .ai-summary h3 {
-            color: white;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid #334155;
-            padding-bottom: 1rem;
+        .tab.active {
+            background: #ffffff;
+            color: #000;
+        }
+
+        .tab-close {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .tab:hover .tab-close {
+            opacity: 1;
+        }
+
+        .new-tab-button {
+            padding: 0.5rem;
+            background: transparent;
+            color: #666;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            height: 28px;
+        }
+
+        .new-tab-button:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #000;
         }
 
         .bookmarks-bar {
             display: flex;
-            padding: 1rem 1.5rem;
-            background: #1e293b;
-            border-bottom: 1px solid #334155;
-            gap: 1rem;
-            overflow-x: auto;
-            scrollbar-width: none;
+            padding: 0.25rem 0.5rem;
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+            gap: 0.5rem;
         }
 
         .bookmark-item {
-            padding: 0.75rem 1.25rem;
-            background: rgba(30, 41, 59, 0.4);
-            border-radius: 10px;
-            color: #94a3b8;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            color: #666;
             cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 12px;
             white-space: nowrap;
-            font-size: 0.875rem;
         }
 
         .bookmark-item:hover {
-            background: rgba(30, 41, 59, 0.6);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(40px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            background: rgba(0, 0, 0, 0.05);
+            color: #000;
         }
 
         @keyframes spin {
@@ -407,96 +225,44 @@
         }
 
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Rest of the HTML remains the same -->
-    <div class="welcome-screen" id="welcomeScreen">
-        <div class="welcome-logo">Sentra</div>
-        <div class="welcome-intro">
-            Experience the next generation of web browsing with Sentra. 
-            Powered by advanced AI, enhanced privacy features, and a beautiful interface designed for the modern web.
-        </div>
-        <input type="text" class="welcome-search" placeholder="Search or enter web address" onkeypress="handleWelcomeSearch(event)">
-        <div class="welcome-shortcuts">
-            <div class="shortcut-card" onclick="loadURL('https://google.com')">
-                <i class="fab fa-google"></i>
-                Google
-            </div>
-            <div class="shortcut-card" onclick="loadURL('https://youtube.com')">
-                <i class="fab fa-youtube"></i>
-                YouTube
-            </div>
-            <div class="shortcut-card" onclick="loadURL('https://github.com')">
-                <i class="fab fa-github"></i>
-                GitHub
-            </div>
-            <div class="shortcut-card" onclick="loadURL('https://reddit.com')">
-                <i class="fab fa-reddit"></i>
-                Reddit
-            </div>
-        </div>
-    </div>
-
-    <!-- Rest of the HTML structure remains unchanged -->
-    <div class="cookie-banner" id="cookieBanner">
-        <div>This browser uses cookies to enhance your browsing experience. By continuing to use this browser, you agree to our use of cookies.</div>
-        <button onclick="acceptCookies()">Accept</button>
-    </div>
-
     <div class="browser-container">
         <div class="tabs-bar" id="tabsBar">
-            <button class="new-tab-button" onclick="createNewTab()">+ New Tab</button>
+            <button class="new-tab-button" onclick="createNewTab()">+</button>
         </div>
         <div class="toolbar">
             <div class="nav-buttons">
-                <button class="nav-button" onclick="goBack()" data-tooltip="Go Back">
+                <button class="nav-button" onclick="goBack()" id="backButton">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
                     </svg>
                 </button>
-                <button class="nav-button" onclick="goForward()" data-tooltip="Go Forward">
+                <button class="nav-button" onclick="goForward()" id="forwardButton">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
                     </svg>
                 </button>
-                <button class="nav-button" onclick="refresh()" data-tooltip="Refresh">
+                <button class="nav-button" onclick="refresh()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
                     </svg>
                 </button>
             </div>
             <div class="address-bar">
-                <input type="text" id="urlInput" placeholder="Search or enter web address" 
+                <input type="text" id="urlInput" placeholder="Search or enter website name" 
                        onkeypress="handleSearch(event)">
             </div>
             <div class="toolbar-buttons">
-                <button class="toolbar-button" onclick="toggleAISummary()" data-tooltip="Get AI Summary">
+                <button class="toolbar-button" onclick="handleShare()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
                     </svg>
-                    AI Summary
                 </button>
-                <button class="toolbar-button" onclick="handlePrint()" data-tooltip="Print">
-                    <i class="fas fa-print"></i>
-                    Print
-                </button>
-                <button class="toolbar-button" onclick="handleZoomIn()" data-tooltip="Zoom In">
-                    <i class="fas fa-search-plus"></i>
-                    Zoom In
-                </button>
-                <button class="toolbar-button" onclick="handleZoomOut()" data-tooltip="Zoom Out">
-                    <i class="fas fa-search-minus"></i>
-                    Zoom Out
-                </button>
-                <button class="toolbar-button" onclick="handleZoomReset()" data-tooltip="Reset Zoom">
-                    <i class="fas fa-compress-arrows-alt"></i>
-                    Reset
-                </button>
-                <button class="toolbar-button" onclick="handleAddBookmark()" data-tooltip="Bookmark">
-                    <i class="fas fa-bookmark"></i>
-                    Bookmark
+                <button class="toolbar-button" onclick="handleAddBookmark()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -504,43 +270,27 @@
         <div class="browser-content">
             <webview id="webview" src="about:blank" allowpopups webpreferences="contextIsolation=false"></webview>
             <div class="loading-animation" id="loadingAnimation"></div>
-            <div id="aiSummary" class="ai-summary">
-                <h3>AI Summary</h3>
-                <p id="summaryContent">Click the AI Summary button to analyze the current page.</p>
-            </div>
-            <div id="downloadProgress" class="download-progress"></div>
         </div>
     </div>
 
-    <!-- The script section remains unchanged -->
     <script>
         const { ipcRenderer } = require('electron');
         const urlInput = document.getElementById('urlInput');
         const webview = document.getElementById('webview');
-        const aiSummary = document.getElementById('aiSummary');
-        const summaryContent = document.getElementById('summaryContent');
-        const downloadProgress = document.getElementById('downloadProgress');
         const bookmarksBar = document.getElementById('bookmarksBar');
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const cookieBanner = document.getElementById('cookieBanner');
         const loadingAnimation = document.getElementById('loadingAnimation');
         const tabsBar = document.getElementById('tabsBar');
+        const backButton = document.getElementById('backButton');
+        const forwardButton = document.getElementById('forwardButton');
         
-        let isSummaryVisible = false;
         let tabs = [];
         let activeTabId = null;
-        let currentZoomLevel = 0;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            if (!localStorage.getItem('cookiesAccepted')) {
-                cookieBanner.style.display = 'flex';
-            } else {
-                cookieBanner.style.display = 'none';
-            }
-            
             createNewTab();
             ipcRenderer.send('get-bookmarks');
+            updateNavigationButtons();
         });
 
         function createNewTab(url = 'https://www.google.com') {
@@ -559,7 +309,6 @@
             tabElement.className = 'tab active';
             tabElement.setAttribute('data-tab-id', tabId);
             tabElement.innerHTML = `
-                <img class="tab-favicon" src="${tab.favicon || 'favicon.ico'}" onerror="this.src='favicon.ico'">
                 <span class="tab-title">${tab.title}</span>
                 <div class="tab-close" onclick="closeTab(${tabId})">×</div>
             `;
@@ -573,6 +322,11 @@
             tabsBar.insertBefore(tabElement, document.querySelector('.new-tab-button'));
             updateTabs();
             loadURL(url);
+        }
+
+        function updateNavigationButtons() {
+            backButton.disabled = !webview.canGoBack();
+            forwardButton.disabled = !webview.canGoForward();
         }
 
         function switchTab(tabId) {
@@ -605,35 +359,7 @@
             });
         }
 
-        function updateTabInfo(id, info) {
-            const tab = tabs.find(t => t.id === id);
-            if (tab) {
-                Object.assign(tab, info);
-                const tabElement = document.querySelector(`.tab[data-tab-id="${id}"]`);
-                if (tabElement) {
-                    const favicon = tabElement.querySelector('.tab-favicon');
-                    const title = tabElement.querySelector('.tab-title');
-                    if (info.favicon) favicon.src = info.favicon;
-                    if (info.title) title.textContent = info.title;
-                }
-            }
-        }
-
-        function acceptCookies() {
-            localStorage.setItem('cookiesAccepted', 'true');
-            cookieBanner.style.display = 'none';
-        }
-
-        function handleWelcomeSearch(e) {
-            if (e.key === 'Enter') {
-                welcomeScreen.classList.add('hidden');
-                const searchQuery = e.target.value;
-                loadURL(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`);
-            }
-        }
-
         function loadURL(url) {
-            welcomeScreen.classList.add('hidden');
             loadingAnimation.style.display = 'block';
             
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -644,32 +370,6 @@
             urlInput.value = url;
             updateTabInfo(activeTabId, { url });
         }
-
-        webview.addEventListener('did-start-loading', () => {
-            loadingAnimation.style.display = 'block';
-            urlInput.value = webview.getURL();
-        });
-
-        webview.addEventListener('did-finish-load', () => {
-            loadingAnimation.style.display = 'none';
-            urlInput.value = webview.getURL();
-            
-            webview.getTitle().then(title => {
-                updateTabInfo(activeTabId, { 
-                    title,
-                    url: webview.getURL()
-                });
-            });
-            
-            ipcRenderer.send('update-history', {
-                url: webview.getURL(),
-                title: webview.getTitle()
-            });
-        });
-
-        webview.addEventListener('page-favicon-updated', (e) => {
-            updateTabInfo(activeTabId, { favicon: e.favicons[0] });
-        });
 
         function handleSearch(e) {
             if (e.key === 'Enter') {
@@ -682,6 +382,37 @@
                 loadURL(url);
             }
         }
+
+        function updateTabInfo(id, info) {
+            const tab = tabs.find(t => t.id === id);
+            if (tab) {
+                Object.assign(tab, info);
+                const tabElement = document.querySelector(`.tab[data-tab-id="${id}"]`);
+                if (tabElement) {
+                    const title = tabElement.querySelector('.tab-title');
+                    if (info.title) title.textContent = info.title;
+                }
+            }
+        }
+
+        webview.addEventListener('did-start-loading', () => {
+            loadingAnimation.style.display = 'block';
+            urlInput.value = webview.getURL();
+            updateNavigationButtons();
+        });
+
+        webview.addEventListener('did-finish-load', () => {
+            loadingAnimation.style.display = 'none';
+            urlInput.value = webview.getURL();
+            updateNavigationButtons();
+            
+            webview.getTitle().then(title => {
+                updateTabInfo(activeTabId, { 
+                    title,
+                    url: webview.getURL()
+                });
+            });
+        });
 
         function goBack() {
             if (webview.canGoBack()) {
@@ -699,23 +430,8 @@
             webview.reload();
         }
 
-        function handlePrint() {
-            webview.print();
-        }
-
-        function handleZoomIn() {
-            currentZoomLevel += 0.1;
-            webview.setZoomLevel(currentZoomLevel);
-        }
-
-        function handleZoomOut() {
-            currentZoomLevel -= 0.1;
-            webview.setZoomLevel(currentZoomLevel);
-        }
-
-        function handleZoomReset() {
-            currentZoomLevel = 0;
-            webview.setZoomLevel(0);
+        function handleShare() {
+            ipcRenderer.send('share-url', webview.getURL());
         }
 
         function handleAddBookmark() {
@@ -742,34 +458,9 @@
             });
         }
 
-        function toggleAISummary() {
-            isSummaryVisible = !isSummaryVisible;
-            aiSummary.classList.toggle('visible');
-            if (isSummaryVisible) {
-                generateSummary();
-            }
-        }
-
-        async function generateSummary() {
-            summaryContent.textContent = "Analyzing page content...";
-            try {
-                const pageContent = await webview.executeJavaScript(`
-                    document.body.innerText
-                `);
-                ipcRenderer.send('generate-summary', pageContent);
-            } catch (error) {
-                summaryContent.textContent = "Failed to analyze page content. Please try again.";
-            }
-        }
-
-        ipcRenderer.on('summary-result', (event, summary) => {
-            summaryContent.textContent = summary;
-        });
-
         // Initialize
         ipcRenderer.send('get-bookmarks');
 
-        // Handle downloads
         webview.addEventListener('new-window', (e) => {
             e.preventDefault();
             loadURL(e.url);
