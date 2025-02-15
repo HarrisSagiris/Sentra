@@ -4,13 +4,14 @@ const path = require('path');
 const url = require('url');
 const fs = require('fs');
 
-// Keep a global reference of the window object to avoid garbage collection
+// Keep a global reference of window objects
+let windows = new Set();
 let mainWindow;
 
-// Create the browser window
-function createWindow() {
+// Create a new browser window
+function createWindow(isMainWindow = false) {
     try {
-        mainWindow = new BrowserWindow({
+        const win = new BrowserWindow({
             width: 1200,
             height: 800,
             webPreferences: {
@@ -23,10 +24,20 @@ function createWindow() {
             icon: path.join(__dirname, 'assets/icon.png')
         });
 
-        // Load the index.html file
-        mainWindow.loadFile('index.html').catch(err => {
-            console.error('Failed to load index.html:', err);
-        });
+        if (isMainWindow) {
+            mainWindow = win;
+            // Load the index.html file for main window
+            win.loadFile('index.html').catch(err => {
+                console.error('Failed to load index.html:', err);
+            });
+        } else {
+            // Load blank page for additional windows
+            win.loadFile('index.html').catch(err => {
+                console.error('Failed to load index.html:', err);
+            });
+        }
+
+        windows.add(win);
 
         // Set up ad blocker
         session.defaultSession.webRequest.onBeforeRequest((details, callback) => {
@@ -72,13 +83,13 @@ function createWindow() {
                     defaultPath: fileName,
                     buttonLabel: 'Save'
                 }).then(result => {
-                    if (!result.canceled && mainWindow) {
+                    if (!result.canceled) {
                         item.setSavePath(result.filePath);
                         
                         item.on('updated', (event, state) => {
-                            if (state === 'progressing' && mainWindow) {
+                            if (state === 'progressing') {
                                 const progress = item.getReceivedBytes() / item.getTotalBytes();
-                                mainWindow.webContents.send('download-progress', {
+                                webContents.send('download-progress', {
                                     filename: fileName,
                                     progress: progress * 100
                                 });
@@ -86,12 +97,10 @@ function createWindow() {
                         });
 
                         item.once('done', (event, state) => {
-                            if (mainWindow) {
-                                mainWindow.webContents.send('download-complete', {
-                                    filename: fileName,
-                                    success: state === 'completed'
-                                });
-                            }
+                            webContents.send('download-complete', {
+                                filename: fileName,
+                                success: state === 'completed'
+                            });
                         });
                     }
                 }).catch(err => {
@@ -103,13 +112,15 @@ function createWindow() {
         });
 
         // Handle window closing
-        mainWindow.on('closed', () => {
-            mainWindow = null;
+        win.on('closed', () => {
+            windows.delete(win);
+            if (win === mainWindow) {
+                mainWindow = null;
+            }
         });
 
         // Handle navigation
-        mainWindow.webContents.on('will-navigate', (event, url) => {
-            // Allow navigation to proceed
+        win.webContents.on('will-navigate', (event, url) => {
             try {
                 // Add any navigation validation here
             } catch (err) {
@@ -120,8 +131,9 @@ function createWindow() {
         // Enable find in page
         ipcMain.on('find-in-page', (event, searchText) => {
             try {
-                if (mainWindow && searchText) {
-                    mainWindow.webContents.findInPage(searchText);
+                const win = BrowserWindow.fromWebContents(event.sender);
+                if (win && searchText) {
+                    win.webContents.findInPage(searchText);
                 }
             } catch (err) {
                 console.error('Find in page error:', err);
@@ -129,7 +141,7 @@ function createWindow() {
         });
 
         // Handle external links
-        mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        win.webContents.setWindowOpenHandler(({ url }) => {
             try {
                 if (url) {
                     shell.openExternal(url);
@@ -144,8 +156,9 @@ function createWindow() {
         // Enable print functionality
         ipcMain.on('print-page', (event) => {
             try {
-                if (mainWindow && event.sender) {
-                    const webview = mainWindow.webContents.fromId(event.sender.webContents.id);
+                const win = BrowserWindow.fromWebContents(event.sender);
+                if (win && event.sender) {
+                    const webview = win.webContents.fromId(event.sender.webContents.id);
                     if (webview) {
                         webview.print();
                     }
@@ -156,10 +169,11 @@ function createWindow() {
         });
 
         // Enable zoom controls
-        ipcMain.on('zoom-in', () => {
+        ipcMain.on('zoom-in', (event) => {
             try {
-                if (mainWindow) {
-                    const webview = mainWindow.webContents;
+                const win = BrowserWindow.fromWebContents(event.sender);
+                if (win) {
+                    const webview = win.webContents;
                     const currentZoom = webview.getZoomFactor();
                     webview.setZoomFactor(Math.min(currentZoom + 0.1, 3.0));
                 }
@@ -168,10 +182,11 @@ function createWindow() {
             }
         });
 
-        ipcMain.on('zoom-out', () => {
+        ipcMain.on('zoom-out', (event) => {
             try {
-                if (mainWindow) {
-                    const webview = mainWindow.webContents;
+                const win = BrowserWindow.fromWebContents(event.sender);
+                if (win) {
+                    const webview = win.webContents;
                     const currentZoom = webview.getZoomFactor();
                     webview.setZoomFactor(Math.max(currentZoom - 0.1, 0.3));
                 }
@@ -180,10 +195,11 @@ function createWindow() {
             }
         });
 
-        ipcMain.on('zoom-reset', () => {
+        ipcMain.on('zoom-reset', (event) => {
             try {
-                if (mainWindow) {
-                    mainWindow.webContents.setZoomFactor(1.0);
+                const win = BrowserWindow.fromWebContents(event.sender);
+                if (win) {
+                    win.webContents.setZoomFactor(1.0);
                 }
             } catch (err) {
                 console.error('Zoom reset error:', err);
@@ -196,7 +212,25 @@ function createWindow() {
 }
 
 // Initialize app
-electron.app.whenReady().then(createWindow).catch(err => {
+electron.app.whenReady().then(() => {
+    createWindow(true); // Create main window
+    
+    // Add menu item for new window
+    const { Menu } = electron;
+    const template = [
+        {
+            label: 'File',
+            submenu: [
+                {
+                    label: 'New Window',
+                    accelerator: 'CmdOrCtrl+N',
+                    click: () => createWindow()
+                }
+            ]
+        }
+    ];
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}).catch(err => {
     console.error('App initialization error:', err);
 });
 
@@ -214,8 +248,8 @@ electron.app.on('window-all-closed', () => {
 // Recreate window when dock icon is clicked (macOS)
 electron.app.on('activate', () => {
     try {
-        if (mainWindow === null) {
-            createWindow();
+        if (windows.size === 0) {
+            createWindow(true);
         }
     } catch (err) {
         console.error('Window recreation error:', err);
@@ -225,9 +259,10 @@ electron.app.on('activate', () => {
 // Handle search queries
 ipcMain.on('search', (event, query) => {
     try {
-        if (mainWindow && query) {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (win && query) {
             const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-            mainWindow.webContents.loadURL(searchUrl);
+            win.webContents.loadURL(searchUrl);
         }
     } catch (err) {
         console.error('Search error:', err);
@@ -239,9 +274,11 @@ electron.app.on('web-contents-created', (event, contents) => {
     contents.on('new-window', (event, navigationUrl) => {
         try {
             event.preventDefault();
-            if (mainWindow && navigationUrl) {
-                mainWindow.webContents.loadURL(navigationUrl);
-            }
+            createWindow().then(win => {
+                if (win && navigationUrl) {
+                    win.webContents.loadURL(navigationUrl);
+                }
+            });
         } catch (err) {
             console.error('New window error:', err);
         }
