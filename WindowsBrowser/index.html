@@ -416,6 +416,58 @@
             opacity: 1;
             visibility: visible;
         }
+
+        /* New tab styles */
+        .tabs-bar {
+            display: flex;
+            background: #2c3e50;
+            padding: 10px 15px 0;
+            gap: 5px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            max-width: 250px;
+            position: relative;
+        }
+
+        .tab.active {
+            background: #3498db;
+        }
+
+        .tab-close {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+        }
+
+        .new-tab-button {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .new-tab-button:hover {
+            background: rgba(255,255,255,0.2);
+        }
     </style>
 </head>
 <body>
@@ -452,6 +504,9 @@
     </div>
 
     <div class="browser-container">
+        <div class="tabs-bar" id="tabsBar">
+            <button class="new-tab-button" onclick="createNewTab()">+ New Tab</button>
+        </div>
         <div class="toolbar">
             <div class="nav-buttons">
                 <button class="nav-button" onclick="goBack()" data-tooltip="Go Back">
@@ -490,7 +545,7 @@
         </div>
         <div id="bookmarksBar" class="bookmarks-bar"></div>
         <div class="browser-content">
-            <webview id="webview" src="about:blank" allowpopups webpreferences="contextIsolation=false"></webview>
+            <webview id="webview" src="https://www.google.com" allowpopups webpreferences="contextIsolation=false"></webview>
             <div class="loading-animation" id="loadingAnimation"></div>
             <div id="aiSummary" class="ai-summary">
                 <h3>AI Summary</h3>
@@ -511,7 +566,58 @@
         const welcomeScreen = document.getElementById('welcomeScreen');
         const cookieBanner = document.getElementById('cookieBanner');
         const loadingAnimation = document.getElementById('loadingAnimation');
+        const tabsBar = document.getElementById('tabsBar');
         let isSummaryVisible = false;
+        let tabs = [];
+        let activeTabId = null;
+
+        // Tab management
+        function createNewTab(url = 'https://www.google.com') {
+            const tabId = Date.now();
+            const tab = {
+                id: tabId,
+                url: url,
+                title: 'New Tab'
+            };
+            
+            tabs.push(tab);
+            activeTabId = tabId;
+            
+            const tabElement = document.createElement('div');
+            tabElement.className = 'tab active';
+            tabElement.setAttribute('data-tab-id', tabId);
+            tabElement.innerHTML = `
+                <span class="tab-title">${tab.title}</span>
+                <div class="tab-close" onclick="closeTab(${tabId})">×</div>
+            `;
+            
+            tabsBar.insertBefore(tabElement, document.querySelector('.new-tab-button'));
+            loadURL(url);
+            updateTabs();
+        }
+
+        function closeTab(tabId) {
+            const index = tabs.findIndex(tab => tab.id === tabId);
+            if (index > -1) {
+                tabs.splice(index, 1);
+                if (tabs.length === 0) {
+                    createNewTab();
+                } else {
+                    activeTabId = tabs[Math.min(index, tabs.length - 1)].id;
+                }
+                updateTabs();
+            }
+        }
+
+        function updateTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                const tabId = parseInt(tab.getAttribute('data-tab-id'));
+                tab.classList.toggle('active', tabId === activeTabId);
+            });
+        }
+
+        // Initialize first tab
+        createNewTab();
 
         // Always show welcome screen on startup
         welcomeScreen.classList.remove('hidden');
@@ -531,7 +637,8 @@
         function handleWelcomeSearch(e) {
             if (e.key === 'Enter') {
                 welcomeScreen.classList.add('hidden');
-                handleSearch(e);
+                const searchQuery = e.target.value;
+                loadURL(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`);
             }
         }
 
