@@ -11,7 +11,8 @@
 
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
+            color: #2c3e50;
         }
 
         .welcome-screen {
@@ -20,124 +21,158 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background: linear-gradient(135deg, #2c3e50, #3498db);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             color: white;
-            transition: opacity 0.5s;
+            transition: all 0.5s ease;
         }
 
         .welcome-screen.hidden {
             opacity: 0;
+            transform: scale(0.95);
             pointer-events: none;
         }
 
         .welcome-logo {
-            font-size: 48px;
-            margin-bottom: 20px;
-            font-weight: bold;
+            font-size: 56px;
+            margin-bottom: 30px;
+            font-weight: 800;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            letter-spacing: -1px;
         }
 
         .welcome-search {
-            width: 600px;
-            padding: 15px 25px;
-            border-radius: 30px;
+            width: 650px;
+            padding: 20px 30px;
+            border-radius: 50px;
             border: none;
             font-size: 18px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .welcome-search:focus {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+            outline: none;
         }
 
         .welcome-shortcuts {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(4, 180px);
+            gap: 25px;
             margin-top: 30px;
         }
 
         .shortcut-card {
             background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 10px;
+            padding: 25px;
+            border-radius: 15px;
             text-align: center;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .shortcut-card:hover {
-            transform: scale(1.05);
+            transform: translateY(-5px) scale(1.05);
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
         .cookie-banner {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.9);
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(52, 73, 94, 0.95);
             color: white;
-            padding: 15px;
+            padding: 20px 30px;
+            border-radius: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
+            max-width: 90%;
+            width: 1000px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         .cookie-banner button {
-            padding: 8px 20px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 5px;
-            background: #2a5298;
+            border-radius: 8px;
+            background: #3498db;
             color: white;
             cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .cookie-banner button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
         }
 
         .browser-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
+            background: white;
         }
 
         .toolbar {
             display: flex;
             align-items: center;
-            padding: 12px;
-            background: linear-gradient(to right, #1e3c72, #2a5298);
+            padding: 15px 20px;
+            background: linear-gradient(to right, #2c3e50, #3498db);
             color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .nav-buttons {
             display: flex;
-            gap: 12px;
-            margin-right: 20px;
+            gap: 15px;
+            margin-right: 25px;
         }
 
         .nav-button {
             border: none;
-            background: rgba(255,255,255,0.1);
-            padding: 10px;
-            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             color: white;
         }
 
         .nav-button:hover {
-            background: rgba(255,255,255,0.2);
-            transform: scale(1.1);
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
         }
 
         .address-bar {
             flex: 1;
             display: flex;
             align-items: center;
-            background: rgba(255,255,255,0.9);
-            border-radius: 25px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
             padding: 8px 20px;
-            margin: 0 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 0 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .address-bar:focus-within {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
         }
 
         .address-bar input {
@@ -145,33 +180,34 @@
             border: none;
             background: none;
             outline: none;
-            font-size: 15px;
-            padding: 5px;
-            color: #333;
+            font-size: 16px;
+            padding: 8px;
+            color: #2c3e50;
         }
 
         .toolbar-buttons {
             display: flex;
-            gap: 8px;
+            gap: 12px;
         }
 
         .toolbar-button {
-            padding: 10px 15px;
-            background: rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.15);
             color: white;
             border: none;
-            border-radius: 20px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             font-size: 14px;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
         }
 
         .toolbar-button:hover {
-            background: rgba(255,255,255,0.2);
-            transform: scale(1.05);
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
         }
 
         .browser-content {
@@ -188,21 +224,21 @@
 
         .ai-summary {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 350px;
+            top: 30px;
+            right: 30px;
+            width: 400px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
-            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 25px;
             display: none;
             max-height: 80vh;
             overflow-y: auto;
-            animation: slideIn 0.3s ease;
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
+            from { transform: translateX(100px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
 
@@ -211,53 +247,58 @@
         }
 
         .ai-summary h3 {
-            margin-bottom: 15px;
-            color: #1e3c72;
-            font-size: 18px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 22px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+            font-weight: 600;
         }
 
         .bookmarks-bar {
             display: flex;
-            padding: 8px 15px;
+            padding: 12px 20px;
             background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #ecf0f1;
             overflow-x: auto;
             scrollbar-width: thin;
+            gap: 15px;
         }
 
         .bookmark-item {
-            padding: 6px 12px;
-            margin-right: 8px;
-            white-space: nowrap;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 8px;
             cursor: pointer;
-            border-radius: 15px;
-            transition: all 0.2s;
-            color: #444;
-            font-size: 13px;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+            font-size: 14px;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .bookmark-item:hover {
-            background: #e8eaed;
-            transform: translateY(-1px);
+            background: #ecf0f1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .download-progress {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #1e3c72;
+            bottom: 30px;
+            right: 30px;
+            background: #2c3e50;
             color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             display: none;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -267,12 +308,12 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
+            background: #bdc3c7;
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #ecf0f1;
         }
     </style>
 </head>

@@ -9,202 +9,297 @@ let mainWindow;
 
 // Create the browser window
 function createWindow() {
-    mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 800,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            webviewTag: true, // Enable webview tag
-            plugins: true // Enable plugins like PDF viewer
-        },
-        icon: path.join(__dirname, 'assets/icon.png')
-    });
-
-    // Load the index.html file
-    mainWindow.loadFile('index.html');
-
-    // Set up ad blocker
-    session.defaultSession.webRequest.onBeforeRequest((details, callback) => {
-        const adBlockList = [
-            '*://*.doubleclick.net/*',
-            '*://*.google-analytics.com/*',
-            '*://*.facebook.com/*',
-            '*://creative.ak.fbcdn.net/*',
-            '*://*.adbrite.com/*',
-            '*://*.exponential.com/*',
-            '*://*.quantserve.com/*',
-            '*://*.scorecardresearch.com/*',
-            '*://*.zedo.com/*',
-            '*://*.googlesyndication.com/*',
-            '*://*.googleadservices.com/*',
-            '*://*.adnxs.com/*',
-            '*://*.outbrain.com/*',
-            '*://*.taboola.com/*',
-            '*://*.adroll.com/*',
-            '*://*.criteo.com/*'
-        ];
-
-        const shouldBlock = adBlockList.some(pattern => {
-            const regexPattern = pattern.replace(/\*/g, '.*');
-            return new RegExp(regexPattern).test(details.url);
+    try {
+        mainWindow = new BrowserWindow({
+            width: 1200,
+            height: 800,
+            webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false,
+                webviewTag: true,
+                plugins: true,
+                sandbox: false // Disable sandbox for full functionality
+            },
+            icon: path.join(__dirname, 'assets/icon.png')
         });
 
-        callback({ cancel: shouldBlock });
-    });
+        // Load the index.html file
+        mainWindow.loadFile('index.html').catch(err => {
+            console.error('Failed to load index.html:', err);
+        });
 
-    // Set up download manager
-    session.defaultSession.on('will-download', (event, item, webContents) => {
-        // Get the file name
-        const fileName = item.getFilename();
-        
-        // Show save dialog
-        dialog.showSaveDialog({
-            title: 'Save file',
-            defaultPath: fileName,
-            buttonLabel: 'Save'
-        }).then(result => {
-            if (!result.canceled) {
-                item.setSavePath(result.filePath);
-                
-                // Handle download progress
-                item.on('updated', (event, state) => {
-                    if (state === 'progressing') {
-                        const progress = item.getReceivedBytes() / item.getTotalBytes();
-                        mainWindow.webContents.send('download-progress', {
-                            filename: fileName,
-                            progress: progress * 100
-                        });
-                    }
+        // Set up ad blocker
+        session.defaultSession.webRequest.onBeforeRequest((details, callback) => {
+            try {
+                const adBlockList = [
+                    '*://*.doubleclick.net/*',
+                    '*://*.google-analytics.com/*',
+                    '*://*.facebook.com/*',
+                    '*://creative.ak.fbcdn.net/*',
+                    '*://*.adbrite.com/*',
+                    '*://*.exponential.com/*',
+                    '*://*.quantserve.com/*',
+                    '*://*.scorecardresearch.com/*',
+                    '*://*.zedo.com/*',
+                    '*://*.googlesyndication.com/*',
+                    '*://*.googleadservices.com/*',
+                    '*://*.adnxs.com/*',
+                    '*://*.outbrain.com/*',
+                    '*://*.taboola.com/*',
+                    '*://*.adroll.com/*',
+                    '*://*.criteo.com/*'
+                ];
+
+                const shouldBlock = adBlockList.some(pattern => {
+                    const regexPattern = pattern.replace(/\*/g, '.*');
+                    return new RegExp(regexPattern).test(details.url);
                 });
 
-                // Handle download completion
-                item.once('done', (event, state) => {
-                    if (state === 'completed') {
-                        mainWindow.webContents.send('download-complete', {
-                            filename: fileName,
-                            success: true
-                        });
-                    } else {
-                        mainWindow.webContents.send('download-complete', {
-                            filename: fileName,
-                            success: false
-                        });
-                    }
-                });
+                callback({ cancel: shouldBlock });
+            } catch (err) {
+                console.error('Ad blocker error:', err);
+                callback({ cancel: false });
             }
         });
-    });
 
-    // Handle window closing
-    mainWindow.on('closed', () => {
-        mainWindow = null;
-    });
+        // Set up download manager
+        session.defaultSession.on('will-download', (event, item, webContents) => {
+            try {
+                const fileName = item.getFilename();
+                
+                dialog.showSaveDialog({
+                    title: 'Save file',
+                    defaultPath: fileName,
+                    buttonLabel: 'Save'
+                }).then(result => {
+                    if (!result.canceled && mainWindow) {
+                        item.setSavePath(result.filePath);
+                        
+                        item.on('updated', (event, state) => {
+                            if (state === 'progressing' && mainWindow) {
+                                const progress = item.getReceivedBytes() / item.getTotalBytes();
+                                mainWindow.webContents.send('download-progress', {
+                                    filename: fileName,
+                                    progress: progress * 100
+                                });
+                            }
+                        });
 
-    // Handle navigation
-    mainWindow.webContents.on('will-navigate', (event, url) => {
-        // Allow navigation to proceed
-    });
+                        item.once('done', (event, state) => {
+                            if (mainWindow) {
+                                mainWindow.webContents.send('download-complete', {
+                                    filename: fileName,
+                                    success: state === 'completed'
+                                });
+                            }
+                        });
+                    }
+                }).catch(err => {
+                    console.error('Save dialog error:', err);
+                });
+            } catch (err) {
+                console.error('Download error:', err);
+            }
+        });
 
-    // Enable find in page
-    ipcMain.on('find-in-page', (event, searchText) => {
-        mainWindow.webContents.findInPage(searchText);
-    });
+        // Handle window closing
+        mainWindow.on('closed', () => {
+            mainWindow = null;
+        });
 
-    // Handle external links
-    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-        shell.openExternal(url);
-        return { action: 'deny' };
-    });
+        // Handle navigation
+        mainWindow.webContents.on('will-navigate', (event, url) => {
+            // Allow navigation to proceed
+            try {
+                // Add any navigation validation here
+            } catch (err) {
+                console.error('Navigation error:', err);
+            }
+        });
 
-    // Enable print functionality
-    ipcMain.on('print-page', (event) => {
-        const webview = mainWindow.webContents.fromId(event.sender.webContents.id);
-        webview.print();
-    });
+        // Enable find in page
+        ipcMain.on('find-in-page', (event, searchText) => {
+            try {
+                if (mainWindow && searchText) {
+                    mainWindow.webContents.findInPage(searchText);
+                }
+            } catch (err) {
+                console.error('Find in page error:', err);
+            }
+        });
 
-    // Enable zoom controls
-    ipcMain.on('zoom-in', () => {
-        const webview = mainWindow.webContents.fromWebContents(mainWindow.webContents);
-        const currentZoom = webview.getZoomFactor();
-        webview.setZoomFactor(currentZoom + 0.1);
-    });
+        // Handle external links
+        mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+            try {
+                if (url) {
+                    shell.openExternal(url);
+                }
+                return { action: 'deny' };
+            } catch (err) {
+                console.error('External link error:', err);
+                return { action: 'deny' };
+            }
+        });
 
-    ipcMain.on('zoom-out', () => {
-        const webview = mainWindow.webContents.fromWebContents(mainWindow.webContents);
-        const currentZoom = webview.getZoomFactor();
-        webview.setZoomFactor(currentZoom - 0.1);
-    });
+        // Enable print functionality
+        ipcMain.on('print-page', (event) => {
+            try {
+                if (mainWindow && event.sender) {
+                    const webview = mainWindow.webContents.fromId(event.sender.webContents.id);
+                    if (webview) {
+                        webview.print();
+                    }
+                }
+            } catch (err) {
+                console.error('Print error:', err);
+            }
+        });
 
-    ipcMain.on('zoom-reset', () => {
-        const webview = mainWindow.webContents.fromWebContents(mainWindow.webContents);
-        webview.setZoomFactor(1.0);
-    });
+        // Enable zoom controls
+        ipcMain.on('zoom-in', () => {
+            try {
+                if (mainWindow) {
+                    const webview = mainWindow.webContents;
+                    const currentZoom = webview.getZoomFactor();
+                    webview.setZoomFactor(Math.min(currentZoom + 0.1, 3.0));
+                }
+            } catch (err) {
+                console.error('Zoom in error:', err);
+            }
+        });
+
+        ipcMain.on('zoom-out', () => {
+            try {
+                if (mainWindow) {
+                    const webview = mainWindow.webContents;
+                    const currentZoom = webview.getZoomFactor();
+                    webview.setZoomFactor(Math.max(currentZoom - 0.1, 0.3));
+                }
+            } catch (err) {
+                console.error('Zoom out error:', err);
+            }
+        });
+
+        ipcMain.on('zoom-reset', () => {
+            try {
+                if (mainWindow) {
+                    mainWindow.webContents.setZoomFactor(1.0);
+                }
+            } catch (err) {
+                console.error('Zoom reset error:', err);
+            }
+        });
+
+    } catch (err) {
+        console.error('Window creation error:', err);
+    }
 }
 
 // Initialize app
-electron.app.whenReady().then(createWindow);
+electron.app.whenReady().then(createWindow).catch(err => {
+    console.error('App initialization error:', err);
+});
 
 // Quit when all windows are closed
 electron.app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        electron.app.quit();
+    try {
+        if (process.platform !== 'darwin') {
+            electron.app.quit();
+        }
+    } catch (err) {
+        console.error('App quit error:', err);
     }
 });
 
 // Recreate window when dock icon is clicked (macOS)
 electron.app.on('activate', () => {
-    if (mainWindow === null) {
-        createWindow();
+    try {
+        if (mainWindow === null) {
+            createWindow();
+        }
+    } catch (err) {
+        console.error('Window recreation error:', err);
     }
 });
 
 // Handle search queries
 ipcMain.on('search', (event, query) => {
-    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-    const webview = mainWindow.webContents.fromWebContents(mainWindow.webContents);
-    webview.loadURL(searchUrl);
+    try {
+        if (mainWindow && query) {
+            const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            mainWindow.webContents.loadURL(searchUrl);
+        }
+    } catch (err) {
+        console.error('Search error:', err);
+    }
 });
 
 // Handle new window creation
 electron.app.on('web-contents-created', (event, contents) => {
     contents.on('new-window', (event, navigationUrl) => {
-        event.preventDefault();
-        const webview = mainWindow.webContents.fromWebContents(mainWindow.webContents);
-        webview.loadURL(navigationUrl);
+        try {
+            event.preventDefault();
+            if (mainWindow && navigationUrl) {
+                mainWindow.webContents.loadURL(navigationUrl);
+            }
+        } catch (err) {
+            console.error('New window error:', err);
+        }
     });
 });
 
 // Enable spellchecker
 electron.app.on('ready', () => {
-    session.defaultSession.setSpellCheckerLanguages(['en-US']);
+    try {
+        session.defaultSession.setSpellCheckerLanguages(['en-US']);
+    } catch (err) {
+        console.error('Spellchecker error:', err);
+    }
 });
 
 // Handle bookmark management
 let bookmarks = [];
 
 ipcMain.on('add-bookmark', (event, bookmark) => {
-    if (!bookmarks.some(b => b.url === bookmark.url)) {
-        bookmarks.push(bookmark);
-        event.reply('bookmarks-updated', bookmarks);
+    try {
+        if (bookmark && bookmark.url && !bookmarks.some(b => b.url === bookmark.url)) {
+            bookmarks.push(bookmark);
+            event.reply('bookmarks-updated', bookmarks);
+        }
+    } catch (err) {
+        console.error('Bookmark add error:', err);
     }
 });
 
 ipcMain.on('get-bookmarks', (event) => {
-    event.reply('bookmarks-updated', bookmarks);
+    try {
+        event.reply('bookmarks-updated', bookmarks);
+    } catch (err) {
+        console.error('Get bookmarks error:', err);
+    }
 });
 
 // Enable history tracking
 let history = [];
 
 ipcMain.on('add-to-history', (event, historyItem) => {
-    history.push({
-        url: historyItem.url,
-        title: historyItem.title,
-        timestamp: Date.now()
-    });
+    try {
+        if (historyItem && historyItem.url) {
+            history.push({
+                url: historyItem.url,
+                title: historyItem.title || '',
+                timestamp: Date.now()
+            });
+        }
+    } catch (err) {
+        console.error('History add error:', err);
+    }
 });
 
 ipcMain.on('get-history', (event) => {
-    event.reply('history-list', history);
+    try {
+        event.reply('history-list', history);
+    } catch (err) {
+        console.error('Get history error:', err);
+    }
 });
